@@ -67,7 +67,9 @@ h3 {
 }
 
 /* All Buttons (Force Dark Background & White Text) */
-div.stButton > button {
+div.stButton > button, 
+div.stFormSubmitButton > button, 
+div.stDownloadButton > button {
     background-color: #0f172a !important;
     border: none !important;
     border-radius: 12px !important;
@@ -77,16 +79,18 @@ div.stButton > button {
     width: 100%;
 }
 
-div.stButton > button:hover {
+div.stButton > button:hover, 
+div.stFormSubmitButton > button:hover, 
+div.stDownloadButton > button:hover {
     background-color: #1e293b !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 15px rgba(15, 23, 42, 0.3) !important;
 }
 
-/* Explicitly force paragraph and span text inside buttons to be white */
-div.stButton > button p, 
-div.stButton > button div, 
-div.stButton > button span {
+/* Explicitly force paragraph and span text inside all buttons to be white */
+div.stButton > button p, div.stButton > button div, div.stButton > button span,
+div.stFormSubmitButton > button p, div.stFormSubmitButton > button div, div.stFormSubmitButton > button span,
+div.stDownloadButton > button p, div.stDownloadButton > button div, div.stDownloadButton > button span {
     color: #ffffff !important;
     font-size: 1.1rem !important;
     font-weight: 500 !important;
@@ -192,44 +196,43 @@ if submitted and user_input:
                     # Success
                     st.markdown('<div class="success-box">Query generated and executed successfully!</div>', unsafe_allow_html=True)
                     
+                    st.markdown("### Generated SQL")
+                    st.code(data["sql"], language="sql")
+                    
                     if data.get("results"):
                         df = pd.DataFrame(data["results"])
                         
-                        # Use Streamlit Tabs to organize Data, Chart, and SQL
-                        tab1, tab2, tab3 = st.tabs(["Data Table", "Visualization", "SQL Query"])
+                        st.markdown(f"### Data Results ({len(data['results'])} rows)")
+                        st.dataframe(df, use_container_width=True)
                         
-                        with tab1:
-                            st.markdown(f"**Results ({len(data['results'])} rows)**")
-                            st.dataframe(df, use_container_width=True)
-                            
-                            # CSV Download Feature
-                            csv = df.to_csv(index=False).encode('utf-8')
-                            st.download_button(
-                                label="Download CSV",
-                                data=csv,
-                                file_name='gengo_results.csv',
-                                mime='text/csv',
-                            )
-                            
-                        with tab2:
-                            st.markdown("**Auto-Generated Chart**")
-                            # Check if dataframe has numeric columns to plot
-                            numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
-                            if len(numeric_cols) > 0 and len(df) > 0:
-                                # Provide a simple bar chart. Streamlit auto-picks the index or first string col for X axis
-                                st.bar_chart(df)
+                        # CSV Download Feature
+                        csv = df.to_csv(index=False).encode('utf-8')
+                        st.download_button(
+                            label="Download CSV",
+                            data=csv,
+                            file_name='gengo_results.csv',
+                            mime='text/csv',
+                        )
+                        
+                        st.markdown("---")
+                        st.markdown("### Visualisation")
+                        
+                        # Advanced auto-charting logic
+                        num_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
+                        cat_cols = df.select_dtypes(include=['object', 'string', 'datetime64']).columns.tolist()
+                        
+                        if len(num_cols) > 0:
+                            if len(cat_cols) > 0:
+                                # Best scenario: X is categorical (like a name/city), Y is numeric (like amount/count)
+                                st.bar_chart(df, x=cat_cols[0], y=num_cols[0])
                             else:
-                                st.info("No numeric data found to visualize for this query.")
-                                
-                        with tab3:
-                            st.markdown("**Generated SQL**")
-                            # st.code automatically provides a copy button
-                            st.code(data["sql"], language="sql")
+                                # If pure numbers, a line chart looks better over an index
+                                st.line_chart(df, y=num_cols[0])
+                        else:
+                            st.info("No numeric data found to visualize for this query.")
                             
                     else:
                         st.warning("No records found matching your query.")
-                        st.markdown("**Generated SQL**")
-                        st.code(data["sql"], language="sql")
 
                     if data.get("suggestion"):
                         st.info(data["suggestion"])
