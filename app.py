@@ -3,17 +3,22 @@ import pandas as pd
 import time
 import requests
 
-st.set_page_config(page_title="Gengo - Your AI Data Analyst", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Gengo - Your AI Data Analyst", layout="wide", initial_sidebar_state="collapsed")
 
 API_URL = "https://gengo-backend-api-b89286ea64a6.herokuapp.com/query"
 
 st.markdown("""
 <style>
 /* Import a premium modern font */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap');
 
-html, body, [class*="css"] {
+html, body, [class*="css"], p, span, div {
     font-family: 'Outfit', sans-serif;
+}
+
+/* Force dark text for readability against the light background */
+p, li, span.st-emotion-cache-10trblm, markdown-text-container {
+    color: #0f172a !important; 
 }
 
 /* Base App Background - Clean Light Gradient */
@@ -26,106 +31,111 @@ html, body, [class*="css"] {
 header {visibility: hidden;}
 footer {visibility: hidden;}
 
+/* Custom padding for wide layout so it doesn't hug edges entirely */
+.block-container {
+    padding-left: 5% !important;
+    padding-right: 5% !important;
+    padding-top: 2rem !important;
+}
+
 /* Headings */
 h1 {
-    font-size: 3.5rem !important;
+    font-size: 4rem !important;
     font-weight: 800 !important;
     background: -webkit-linear-gradient(45deg, #0f172a, #3b82f6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 0px !important;
-    padding-bottom: 10px;
+    margin-bottom: 5px !important;
+    padding-bottom: 5px;
 }
 h2 {
-    font-size: 2rem !important;
+    font-size: 2.2rem !important;
     font-weight: 600 !important;
+    color: #1e293b !important;
+}
+h3 {
+    font-size: 1.5rem !important;
     color: #1e293b !important;
 }
 
 /* Subtext */
 .subtitle {
-    font-size: 1.25rem;
-    color: #475569;
-    font-weight: 400;
-    margin-bottom: 30px;
+    font-size: 1.3rem;
+    color: #334155 !important;
+    font-weight: 500;
+    margin-bottom: 40px;
 }
 
-/* Custom Primary Button Styling */
+/* All Buttons (Force Dark Background & White Text) */
 div.stButton > button {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
-    color: white !important;
+    background: #0f172a !important;
+    color: #ffffff !important;
     border: none !important;
-    border-radius: 50px !important;
-    padding: 0.75rem 1.5rem !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 1.5rem !important;
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
     transition: all 0.3s ease !important;
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2) !important;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2) !important;
     width: 100%;
 }
 
 div.stButton > button:hover {
-    transform: translateY(-3px) !important;
-    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.3) !important;
+    background: #1e293b !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(15, 23, 42, 0.3) !important;
 }
 
-div.stButton > button:active {
-    transform: translateY(1px) !important;
+div.stButton > button * {
+    color: #ffffff !important;
+}
+
+div.stButton > button p {
+    color: #ffffff !important;
 }
 
 /* Text Input Styling (Glassmorphism feel) */
 .stTextInput input {
-    background: rgba(255, 255, 255, 0.6) !important;
-    border: 1px solid rgba(203, 213, 225, 0.5) !important;
-    backdrop-filter: blur(10px) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(15, 23, 42, 0.2) !important;
     border-radius: 12px !important;
-    padding: 1rem !important;
-    font-size: 1.1rem !important;
+    padding: 1.2rem !important;
+    font-size: 1.2rem !important;
     color: #0f172a !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02) !important;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.02) !important;
 }
 
 .stTextInput input:focus {
     border-color: #3b82f6 !important;
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15) !important;
-    background: #ffffff !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3) !important;
 }
 
 /* Result Boxes */
 .success-box {
-    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    background: #d1fae5;
     border-left: 5px solid #10b981;
     padding: 15px 20px;
     border-radius: 8px;
-    color: #065f46;
+    color: #065f46 !important;
     font-weight: 600;
     margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.1);
 }
 
 .code-box {
     background-color: #1e293b;
     border-radius: 12px;
     padding: 20px;
-    color: #e2e8f0;
+    color: #e2e8f0 !important;
     font-family: 'Courier New', monospace;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     overflow-x: auto;
     margin-bottom: 20px;
-    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-}
-
-/* Checkbox styling */
-.stCheckbox label {
-    font-weight: 500;
-    color: #475569;
 }
 
 hr {
     border: 0;
     height: 1px;
-    background: linear-gradient(to right, rgba(0,0,0,0), rgba(15,23,42,0.1), rgba(0,0,0,0));
+    background: rgba(15,23,42,0.1);
     margin: 40px 0;
 }
 </style>
@@ -142,11 +152,11 @@ st.markdown('<p class="subtitle">Query your legacy database in plain English. AI
 # Three column highlights
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.markdown("**1. No SQL Needed**<br>Just speak naturally.", unsafe_allow_html=True)
+    st.markdown("### ✨ No SQL Needed\nJust speak naturally and let AI do the work.")
 with col2:
-    st.markdown("**2. Blazing Fast**<br>Instant execution via Llama & Supabase.", unsafe_allow_html=True)
+    st.markdown("### ⚡ Blazing Fast\nInstant execution via Groq & Supabase.")
 with col3:
-    st.markdown("**3. Read-Only Safe**<br>Your data cannot be altered.", unsafe_allow_html=True)
+    st.markdown("### 🔒 Read-Only Safe\nBuilt to guarantee your data cannot be altered.")
 
 st.markdown("<hr>", unsafe_allow_html=True)
 
@@ -154,8 +164,8 @@ st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<h2>Ask your Data</h2>", unsafe_allow_html=True)
 
 # Suggestion Chips
-st.caption("Try one of these to get started:")
-s1, s2, s3 = st.columns(3)
+st.markdown("<p style='font-weight: 500; margin-bottom: 10px;'>Try one of these to get started:</p>", unsafe_allow_html=True)
+s1, s2, s3, s4 = st.columns(4)
 if s1.button("Customers in Mumbai"):
     st.session_state.prefill = "Show me all customers from Mumbai"
 if s2.button("Highest orders"):
