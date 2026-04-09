@@ -5,11 +5,20 @@ import requests
 
 st.set_page_config(page_title="Gengo", layout="wide")
 
+# Ensure your correct Heroku URL is here
 API_URL = "https://gengo-backend-api-b89286ea64a6.herokuapp.com/query"
 
 # 🎨 GLOBAL STYLE
 st.markdown("""
 <style>
+/* Remove default Streamlit padding */
+.block-container {
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+    padding-left: 0rem;
+    padding-right: 0rem;
+}
+
 header {visibility: hidden;}
 footer {visibility: hidden;}
 
@@ -18,20 +27,12 @@ footer {visibility: hidden;}
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* FIX WHITE HEADINGS */
-h2, h3 {
-    color: #111827 !important;
-}
-
 /* NAVBAR */
 .navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
     background: #0f172a;
-    padding: 18px 60px;
-    z-index: 999;
+    padding: 24px 60px;
+    width: 100%;
+    margin-bottom: 40px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
@@ -42,249 +43,166 @@ h2, h3 {
     letter-spacing: 2px;
 }
 
-/* MAIN */
-.main {
-    margin-top: 110px;
-}
-
-/* HERO */
-.hero {
+/* HERO SECTION */
+.hero-wrapper {
+    padding: 60px;
     max-width: 900px;
-    margin-left: 60px;
 }
 
 .hero-title {
     font-size: 64px;
     font-weight: 700;
     color: #111827;
+    margin-bottom: 10px;
 }
 
 .hero-sub {
-    font-size: 20px;
+    font-size: 24px;
+    font-weight: 500;
     color: #374151;
-    margin-top: 15px;
+    margin-bottom: 20px;
 }
 
 .hero-desc {
     font-size: 18px;
     color: #4b5563;
-    margin-top: 10px;
     line-height: 1.6;
+    margin-bottom: 40px;
 }
 
-/* CTA BUTTON */
-.center-btn {
-    text-align: center;
-    margin-top: 50px;
-}
-
-.cta-btn {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: white !important;
-    padding: 14px 36px;
-    border-radius: 40px;
-    text-decoration: none !important;
-    display: inline-block;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.cta-btn:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 30px rgba(15, 23, 42, 0.4);
-}
-
-/* DIVIDER */
-.divider {
-    border-top: 1px solid #d1d5db;
-    margin: 60px 0;
-}
-
-/* SECTION */
-.section-title {
-    font-size: 26px;
-    font-weight: 600;
-    color: #111827;
-}
-
-.section-text {
-    color: #374151;
-    margin-top: 8px;
-}
-
-/* INPUT */
-.stTextInput input {
-    background-color: #ffffff !important;
-    color: #111827 !important;
-    border-radius: 10px;
-    padding: 12px;
-}
-
-/* LABEL */
-label {
-    color: #2563eb !important;
-}
-
-/* BUTTON */
+/* BUTTONS */
 div.stButton > button {
-    background: #0f172a !important;
+    background-color: #0f172a !important;
     color: white !important;
     border-radius: 30px;
-    padding: 12px 28px;
-    transition: 0.3s;
+    padding: 12px 30px;
+    font-weight: 600;
+    border: none;
+    transition: 0.3s all ease;
 }
 
 div.stButton > button:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3);
 }
 
-/* CUSTOM BOX */
+/* CUSTOM BOXES */
 .box {
     background: #ffffff;
     border: 1px solid #e5e7eb;
-    padding: 18px;
+    padding: 20px;
     border-radius: 12px;
-    margin-top: 15px;
+    margin-bottom: 20px;
+    color: #111827;
 }
 
-/* SQL BOX */
 .sql-box {
     background: #0d1117;
     color: #c9d1d9;
-    padding: 18px;
+    padding: 20px;
     border-radius: 12px;
-    font-family: monospace;
-    margin-top: 15px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 15px;
+}
+
+/* REMOVE WHITE HEADINGS FROM STREAMLIT */
+h1, h2, h3, p {
+    color: #111827 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# NAVBAR
+# 1. NAVBAR
 st.markdown('<div class="navbar"><div class="logo">GENGO</div></div>', unsafe_allow_html=True)
 
-# MAIN
-st.markdown('<div class="main">', unsafe_allow_html=True)
-
-# HERO
+# 2. HERO
 st.markdown("""
-<div class="hero">
-<div class="hero-title">Welcome</div>
-<div class="hero-sub">Query your database in plain English</div>
-<div class="hero-desc">
-Gengo is an AI-powered system that converts natural language into SQL queries, executes them, and returns results instantly.
-</div>
+<div class="hero-wrapper">
+    <div class="hero-title">Welcome</div>
+    <div class="hero-sub">Query your database in plain English</div>
+    <div class="hero-desc">
+        Gengo is an AI-powered system that converts natural language into SQL queries, executes them, and returns results instantly.
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ WORKING SCROLL BUTTON (JS FIX)
-st.markdown("""
-<div class="center-btn">
-<button class="cta-btn" onclick="document.getElementById('try-section').scrollIntoView({behavior: 'smooth'});">
- Try it now
-</button>
-</div>
-""", unsafe_allow_html=True)
+# 3. INTERACTIVE SECTION
+with st.container():
+    st.markdown('<div style="padding: 0 60px;">', unsafe_allow_html=True)
+    
+    # WHAT/WHY INFO
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown('<div class="section-title">What Gengo Does</div>', unsafe_allow_html=True)
+        st.write("Converts plain English into SQL and executes it instantly on your legacy database.")
+    
+    with col2:
+        st.markdown('<div class="section-title">Why It Matters</div>', unsafe_allow_html=True)
+        st.write("Ensures non-technical users can access data without waiting for SQL experts.")
 
-st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    st.divider()
 
-# INFO
-col1, col2 = st.columns(2)
+    # THE CORE APP
+    st.markdown("## Try it now", help="Type a question below to query the database")
+    
+    # QUICK SUGGESTIONS
+    c1, c2, c3 = st.columns(3)
+    if c1.button("Customers from New York"):
+        st.session_state.prefill = "Show customers from New York"
+    if c2.button("Top customers"):
+        st.session_state.prefill = "Show top 5 customers by balance"
+    if c3.button("All customers"):
+        st.session_state.prefill = "List all customers"
 
-with col1:
-    st.markdown('<div class="section-title">What Gengo Does</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-text">Converts plain English into SQL and executes it instantly.</div>', unsafe_allow_html=True)
+    # THE FORM (CORE INTERACTION)
+    with st.form("query_form", clear_on_submit=False):
+        user_input = st.text_input("Ask a question about your data...", value=st.session_state.get("prefill", ""))
+        use_fallback = st.checkbox("Use Fallback AI (Ollama)", value=False)
+        submitted = st.form_submit_button("Generate SQL")
 
-with col2:
-    st.markdown('<div class="section-title">Why It Matters</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-text">Makes data accessible to everyone without SQL knowledge.</div>', unsafe_allow_html=True)
-
-st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-
-# 🎯 SCROLL TARGET (IMPORTANT)
-st.markdown('<div id="try-section"></div>', unsafe_allow_html=True)
-
-# TRY
-st.markdown("## Try it now")
-
-c1, c2, c3 = st.columns(3)
-
-if c1.button("Customers from New York"):
-    st.session_state.prefill = "Show customers from New York"
-
-if c2.button("Top customers"):
-    st.session_state.prefill = "Show top 5 customers by balance"
-
-if c3.button("All customers"):
-    st.session_state.prefill = "List all customers"
-
-# INPUT
-with st.form("query_form"):
-    user_input = st.text_input("Ask something...", value=st.session_state.get("prefill", ""))
-    use_fallback = st.checkbox("Use Fallback LLM (Ollama/Llama 3)", value=False)
-    submitted = st.form_submit_button("Generate SQL")
-
-# OUTPUT
-if submitted and user_input:
-
-    placeholder = st.empty()
-
-    # ANIMATION
-    for i in range(3):
-        placeholder.markdown(f"""
-        <div style="
-            padding:16px;
-            border-radius:10px;
-            background:#f1f5f9;
-            color:#111827;
-            font-weight:500;
-        ">
-            🤖 Generating SQL{'.' * (i+1)}
-        </div>
-        """, unsafe_allow_html=True)
-        time.sleep(0.4)
-
-    placeholder.empty()
-
-    try:
-        response = requests.post(API_URL, json={
-            "question": user_input,
-            "use_fallback": use_fallback
-        })
-        
-        data = response.json()
-        
-        if response.status_code == 200 and not data.get("error"):
-            st.markdown("""
-            <div class="box" style="background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46;">
-            Query executed successfully
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.markdown("### 🔍 Your Query")
-            st.markdown(f'<div class="box">{user_input}</div>', unsafe_allow_html=True)
-
-            st.markdown("### ⚙️ Generated SQL")
-            st.markdown(f'<div class="sql-box">{data["sql"]}</div>', unsafe_allow_html=True)
-
-            if data["results"]:
-                st.markdown(f"### 📊 Results ({len(data['results'])} rows)")
-                df = pd.DataFrame(data["results"])
-                st.dataframe(df, use_container_width=True)
-            else:
-                st.warning("No data found for this query.")
-
-            if data.get("suggestion"):
-                st.info(data["suggestion"])
+    # RESULTS LOGIC
+    if submitted and user_input:
+        with st.spinner("🤖 Generating SQL and fetching results..."):
+            try:
+                # Call Heroku Backend
+                response = requests.post(API_URL, json={
+                    "question": user_input,
+                    "use_fallback": use_fallback
+                }, timeout=15)
                 
-            st.caption(f"Execution time: {data['execution_time_ms']}ms")
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if data.get("error"):
+                        st.error(f"Logic Error: {data['error']}")
+                    else:
+                        st.success("Query executed successfully!")
+                        
+                        st.markdown("### ⚙️ Generated SQL")
+                        st.markdown(f'<div class="sql-box">{data["sql"]}</div>', unsafe_allow_html=True)
 
-        else:
-            error_msg = data.get("error", "Unknown error")
-            st.error(f"Failed to process query: {error_msg}")
+                        if data.get("results"):
+                            st.markdown(f"### 📊 Results ({len(data['results'])} rows)")
+                            st.dataframe(pd.DataFrame(data["results"]), use_container_width=True)
+                        else:
+                            st.info("No matching records found in the database.")
 
-    except Exception as e:
-        st.error(f"Could not connect to API: {str(e)}")
+                        if data.get("suggestion"):
+                            st.info(data["suggestion"])
+                        
+                        st.caption(f"Execution Time: {data['execution_time_ms']}ms")
+                else:
+                    st.error(f"Backend Server Error ({response.status_code})")
+            
+            except Exception as e:
+                st.error(f"Connection Failed: Ensure your Heroku backend is up and awake. Error: {str(e)}")
 
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
