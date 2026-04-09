@@ -1,0 +1,61 @@
+-- Drop tables if already exist (clean setup)
+DROP TABLE IF EXISTS ORD_HIST CASCADE;
+DROP TABLE IF EXISTS CUST_MAST CASCADE;
+DROP TABLE IF EXISTS PROD_CAT CASCADE;
+
+-- Customer Master Table
+CREATE TABLE CUST_MAST (
+    CUST_ID SERIAL PRIMARY KEY,
+    CUST_NAME VARCHAR(100),
+    CITY VARCHAR(50),
+    SIGNUP_DATE DATE
+);
+
+-- Product Catalog Table
+CREATE TABLE PROD_CAT (
+    PROD_ID SERIAL PRIMARY KEY,
+    PROD_NAME VARCHAR(100),
+    CATEGORY VARCHAR(50),
+    PRICE NUMERIC(10,2)
+);
+
+-- Order History Table
+CREATE TABLE ORD_HIST (
+    ORD_ID SERIAL PRIMARY KEY,
+    CUST_ID INT,
+    PROD_ID INT,
+    QTY INT,
+    ORD_DATE DATE,
+
+    CONSTRAINT fk_customer
+        FOREIGN KEY(CUST_ID) 
+        REFERENCES CUST_MAST(CUST_ID)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_product
+        FOREIGN KEY(PROD_ID) 
+        REFERENCES PROD_CAT(PROD_ID)
+        ON DELETE CASCADE
+);
+
+-- Indexes (simulate legacy tuning)
+CREATE INDEX idx_cust_city ON CUST_MAST(CITY);
+CREATE INDEX idx_ord_date ON ORD_HIST(ORD_DATE);
+CREATE INDEX idx_ord_cust ON ORD_HIST(CUST_ID);
+CREATE INDEX idx_ord_prod ON ORD_HIST(PROD_ID);
+
+-- Optional: Few sample rows
+INSERT INTO CUST_MAST (CUST_NAME, CITY, SIGNUP_DATE) VALUES
+('Amit Sharma', 'Mumbai', '2023-01-10'),
+('Priya Iyer', 'Chennai', '2023-02-15'),
+('Rahul Verma', 'Delhi', '2023-03-20');
+
+INSERT INTO PROD_CAT (PROD_NAME, CATEGORY, PRICE) VALUES
+('Laptop', 'Electronics', 60000),
+('Phone', 'Electronics', 30000),
+('Table', 'Furniture', 5000);
+
+INSERT INTO ORD_HIST (CUST_ID, PROD_ID, QTY, ORD_DATE) VALUES
+(1,1,1,'2024-01-01'),
+(2,2,2,'2024-01-02'),
+(3,3,1,'2024-01-03');
