@@ -16,9 +16,14 @@ html, body, [class*="css"], p, span, div {
     font-family: 'Outfit', sans-serif;
 }
 
-/* Force dark text for readability against the light background */
-p, li, span.st-emotion-cache-10trblm, markdown-text-container {
+/* Force dark text globally to combat Streamlit dark mode overwrites */
+p, li, span.st-emotion-cache-10trblm, markdown-text-container, label {
     color: #0f172a !important; 
+}
+
+/* Ensure ALL headings are visible and match the 'Ask your Data' style */
+h1, h2, h3, h4, h5, h6 {
+    color: #0f172a !important;
 }
 
 /* Base App Background - Clean Light Gradient */
@@ -48,7 +53,6 @@ footer {visibility: hidden;}
 .hero-section h1 {
     font-size: 5.5rem !important;
     font-weight: 800 !important;
-    color: #0f172a !important; /* Solid color to ensure it never disappears */
     margin-bottom: 5px !important;
     padding-bottom: 5px;
     letter-spacing: -2px;
@@ -56,7 +60,6 @@ footer {visibility: hidden;}
 
 .hero-section .subtitle {
     font-size: 1.5rem;
-    color: #334155 !important;
     font-weight: 400;
 }
 
@@ -75,19 +78,16 @@ footer {visibility: hidden;}
 .info-card h3 {
     font-size: 1.6rem !important;
     font-weight: 600 !important;
-    color: #1e293b !important;
     margin-bottom: 15px !important;
 }
 
 .info-card p {
     font-size: 1.1rem !important;
-    color: #475569 !important;
 }
 
 h2 {
     font-size: 2.5rem !important;
     font-weight: 600 !important;
-    color: #1e293b !important;
 }
 
 /* All Buttons */
