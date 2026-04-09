@@ -41,6 +41,11 @@ def clean_sql_output(sql):
 def query(req: QueryRequest):
     prompt = build_prompt(req.question)
     sql = call_llm(prompt, req.use_fallback)
+
+    # Detect if the LLM returned an error instead of SQL
+    if sql.strip().upper().startswith("ERROR"):
+        return {"error": f"LLM failed to generate SQL: {sql}"}
+
     sql = clean_sql_output(sql)
 
     if not is_safe_select(sql):
