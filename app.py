@@ -33,14 +33,20 @@ footer {visibility: hidden;}
 
 /* Custom padding for wide layout so it doesn't hug edges entirely */
 .block-container {
-    padding-left: 5% !important;
-    padding-right: 5% !important;
-    padding-top: 2rem !important;
+    padding-left: 10% !important;
+    padding-right: 10% !important;
+    padding-top: 3rem !important;
 }
 
-/* Headings */
-h1 {
-    font-size: 4rem !important;
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    padding-top: 3vh;
+    padding-bottom: 6vh;
+}
+
+.hero-section h1 {
+    font-size: 5rem !important;
     font-weight: 800 !important;
     background: -webkit-linear-gradient(45deg, #0f172a, #3b82f6);
     -webkit-background-clip: text;
@@ -48,25 +54,44 @@ h1 {
     margin-bottom: 5px !important;
     padding-bottom: 5px;
 }
+
+.hero-section .subtitle {
+    font-size: 1.5rem;
+    color: #334155 !important;
+    font-weight: 400;
+}
+
+/* Feature Cards */
+.info-card {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    height: 100%;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+
+.info-card h3 {
+    font-size: 1.6rem !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    margin-bottom: 15px !important;
+}
+
+.info-card p {
+    font-size: 1.1rem !important;
+    color: #475569 !important;
+}
+
 h2 {
-    font-size: 2.2rem !important;
+    font-size: 2.5rem !important;
     font-weight: 600 !important;
     color: #1e293b !important;
 }
-h3 {
-    font-size: 1.5rem !important;
-    color: #1e293b !important;
-}
 
-/* Subtext */
-.subtitle {
-    font-size: 1.3rem;
-    color: #334155 !important;
-    font-weight: 500;
-    margin-bottom: 40px;
-}
-
-/* All Buttons (Force Dark Background & White Text) */
+/* All Buttons */
 div.stButton > button, 
 div.stFormSubmitButton > button, 
 div.stDownloadButton > button {
@@ -87,7 +112,6 @@ div.stDownloadButton > button:hover {
     box-shadow: 0 6px 15px rgba(15, 23, 42, 0.3) !important;
 }
 
-/* Explicitly force paragraph and span text inside all buttons to be white */
 div.stButton > button p, div.stButton > button div, div.stButton > button span,
 div.stFormSubmitButton > button p, div.stFormSubmitButton > button div, div.stFormSubmitButton > button span,
 div.stDownloadButton > button p, div.stDownloadButton > button div, div.stDownloadButton > button span {
@@ -123,6 +147,10 @@ div.stDownloadButton > button p, div.stDownloadButton > button div, div.stDownlo
     margin-bottom: 20px;
 }
 
+.massive-spacer {
+    height: 18vh;
+}
+
 hr {
     border: 0;
     height: 1px;
@@ -136,19 +164,23 @@ hr {
 # UI LAYOUT
 # -----------------
 
-# Header Section
+# Landing Page "Hero" Section
+st.markdown('<div class="hero-section">', unsafe_allow_html=True)
 st.markdown("<h1>GENGO</h1>", unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Query your legacy database in plain English. AI-powered SQL generation and execution.</p>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# Three column highlights
+# Three column spacious highlights
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.markdown("### No SQL Needed\nJust speak naturally and let AI do the work.")
+    st.markdown('<div class="info-card"><h3>No SQL Needed</h3><p>Just speak naturally and let AI do the work.</p></div>', unsafe_allow_html=True)
 with col2:
-    st.markdown("### Blazing Fast\nInstant execution via Groq & Supabase.")
+    st.markdown('<div class="info-card"><h3>Blazing Fast</h3><p>Instant execution via limit-free Groq & Supabase architectures.</p></div>', unsafe_allow_html=True)
 with col3:
-    st.markdown("### Read-Only Safe\nBuilt to guarantee your data cannot be altered.")
+    st.markdown('<div class="info-card"><h3>Read-Only Safe</h3><p>Built exclusively to guarantee your legacy data cannot be altered.</p></div>', unsafe_allow_html=True)
 
+# Whitespace spacer so they scroll to "the app"
+st.markdown('<div class="massive-spacer"></div>', unsafe_allow_html=True)
 st.markdown("<hr>", unsafe_allow_html=True)
 
 # Main Interaction Area
