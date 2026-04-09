@@ -25,7 +25,8 @@ def get_schema_info():
     cur.execute("""
     SELECT table_name, column_name
     FROM information_schema.columns
-    WHERE table_schema = 'public'
+    WHERE table_schema = 'sales'
+    ORDER BY table_name, ordinal_position
     """)
 
     rows = cur.fetchall()
@@ -56,7 +57,7 @@ def get_foreign_keys():
         JOIN information_schema.constraint_column_usage AS ccu
           ON ccu.constraint_name = tc.constraint_name
           AND ccu.table_schema = tc.table_schema
-    WHERE tc.constraint_type = 'FOREIGN KEY';
+    WHERE tc.table_schema = 'sales' AND tc.constraint_type = 'FOREIGN KEY';
     """)
 
     rows = cur.fetchall()
@@ -80,6 +81,9 @@ def suggest_index(sql):
 def execute_read_only_query(sql):
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    # Set the search path to the 'sales' schema first
+    cur.execute("SET search_path TO sales, public;")
 
     start = time.time()
     cur.execute(sql)
