@@ -3,7 +3,7 @@ import pandas as pd
 import time
 import requests
 
-st.set_page_config(page_title="Gengo - Your AI Data Analyst", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="GENGO - Your AI Data Analyst", layout="wide", initial_sidebar_state="collapsed")
 
 API_URL = "https://gengo-backend-api-b89286ea64a6.herokuapp.com/query"
 
@@ -68,33 +68,31 @@ h3 {
 
 /* All Buttons (Force Dark Background & White Text) */
 div.stButton > button {
-    background: #0f172a !important;
-    color: #ffffff !important;
+    background-color: #0f172a !important;
     border: none !important;
     border-radius: 12px !important;
     padding: 0.6rem 1.5rem !important;
-    font-size: 1.1rem !important;
-    font-weight: 500 !important;
     transition: all 0.3s ease !important;
     box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2) !important;
     width: 100%;
 }
 
 div.stButton > button:hover {
-    background: #1e293b !important;
+    background-color: #1e293b !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 15px rgba(15, 23, 42, 0.3) !important;
 }
 
-div.stButton > button * {
+/* Explicitly force paragraph and span text inside buttons to be white */
+div.stButton > button p, 
+div.stButton > button div, 
+div.stButton > button span {
     color: #ffffff !important;
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
 }
 
-div.stButton > button p {
-    color: #ffffff !important;
-}
-
-/* Text Input Styling (Glassmorphism feel) */
+/* Text Input Styling */
 .stTextInput input {
     background: rgba(255, 255, 255, 0.8) !important;
     border: 1px solid rgba(15, 23, 42, 0.2) !important;
@@ -121,17 +119,6 @@ div.stButton > button p {
     margin-bottom: 20px;
 }
 
-.code-box {
-    background-color: #1e293b;
-    border-radius: 12px;
-    padding: 20px;
-    color: #e2e8f0 !important;
-    font-family: 'Courier New', monospace;
-    font-size: 1.1rem;
-    overflow-x: auto;
-    margin-bottom: 20px;
-}
-
 hr {
     border: 0;
     height: 1px;
@@ -146,17 +133,17 @@ hr {
 # -----------------
 
 # Header Section
-st.markdown("<h1>Gengo</h1>", unsafe_allow_html=True)
+st.markdown("<h1>GENGO</h1>", unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Query your legacy database in plain English. AI-powered SQL generation and execution.</p>', unsafe_allow_html=True)
 
 # Three column highlights
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.markdown("### ✨ No SQL Needed\nJust speak naturally and let AI do the work.")
+    st.markdown("### No SQL Needed\nJust speak naturally and let AI do the work.")
 with col2:
-    st.markdown("### ⚡ Blazing Fast\nInstant execution via Groq & Supabase.")
+    st.markdown("### Blazing Fast\nInstant execution via Groq & Supabase.")
 with col3:
-    st.markdown("### 🔒 Read-Only Safe\nBuilt to guarantee your data cannot be altered.")
+    st.markdown("### Read-Only Safe\nBuilt to guarantee your data cannot be altered.")
 
 st.markdown("<hr>", unsafe_allow_html=True)
 
@@ -183,11 +170,11 @@ with st.form("query_form"):
     with col_a:
         use_fallback = st.checkbox("Use Fallback AI (Locally hosted Ollama)", value=False)
     with col_b:
-        submitted = st.form_submit_button("Generate & Run SQL")
+        submitted = st.form_submit_button("Generate and Run SQL")
 
 # Results Area
 if submitted and user_input:
-    with st.spinner("🤖 Analyzing your prompt and generating SQL..."):
+    with st.spinner("Analyzing your prompt and generating SQL..."):
         try:
             req_start = time.time()
             response = requests.post(API_URL, json={
@@ -200,28 +187,57 @@ if submitted and user_input:
                 data = response.json()
                 
                 if data.get("error"):
-                    st.error(f"⚠️ **Error:** {data['error']}")
+                    st.error(f"Error: {data['error']}")
                 else:
                     # Success
-                    st.markdown('<div class="success-box">✅ Query generated and executed successfully!</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="success-box">Query generated and executed successfully!</div>', unsafe_allow_html=True)
                     
-                    st.markdown("### ⚙️ The SQL Query")
-                    st.markdown(f'<div class="code-box">{data["sql"]}</div>', unsafe_allow_html=True)
-
                     if data.get("results"):
-                        st.markdown(f"### 📊 Results ({len(data['results'])} rows)")
-                        # Show interactive dataframe
-                        st.dataframe(pd.DataFrame(data["results"]), use_container_width=True)
+                        df = pd.DataFrame(data["results"])
+                        
+                        # Use Streamlit Tabs to organize Data, Chart, and SQL
+                        tab1, tab2, tab3 = st.tabs(["Data Table", "Visualization", "SQL Query"])
+                        
+                        with tab1:
+                            st.markdown(f"**Results ({len(data['results'])} rows)**")
+                            st.dataframe(df, use_container_width=True)
+                            
+                            # CSV Download Feature
+                            csv = df.to_csv(index=False).encode('utf-8')
+                            st.download_button(
+                                label="Download CSV",
+                                data=csv,
+                                file_name='gengo_results.csv',
+                                mime='text/csv',
+                            )
+                            
+                        with tab2:
+                            st.markdown("**Auto-Generated Chart**")
+                            # Check if dataframe has numeric columns to plot
+                            numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
+                            if len(numeric_cols) > 0 and len(df) > 0:
+                                # Provide a simple bar chart. Streamlit auto-picks the index or first string col for X axis
+                                st.bar_chart(df)
+                            else:
+                                st.info("No numeric data found to visualize for this query.")
+                                
+                        with tab3:
+                            st.markdown("**Generated SQL**")
+                            # st.code automatically provides a copy button
+                            st.code(data["sql"], language="sql")
+                            
                     else:
                         st.warning("No records found matching your query.")
+                        st.markdown("**Generated SQL**")
+                        st.code(data["sql"], language="sql")
 
                     if data.get("suggestion"):
                         st.info(data["suggestion"])
                     
-                    st.caption(f"⚡ End-to-end processing time: {req_time}ms (DB execution: {data.get('execution_time_ms', 0)}ms)")
+                    st.caption(f"End-to-end processing time: {req_time}ms (DB execution: {data.get('execution_time_ms', 0)}ms)")
             
             else:
-                st.error(f"**Backend Server Error ({response.status_code}):** Ensure your Heroku Dyno is awake.")
+                st.error(f"Backend Server Error ({response.status_code}): Ensure your Heroku Dyno is awake.")
         
         except Exception as e:
-            st.error(f"**Connection Failed:** Could not reach the API. Error details: `{str(e)}`")
+            st.error(f"Connection Failed: Could not reach the API. Error details: `{str(e)}`")
