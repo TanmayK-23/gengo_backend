@@ -147,7 +147,7 @@ div.stDownloadButton > button p, div.stDownloadButton > button div, div.stDownlo
 }
 
 .massive-spacer {
-    height: 8vh;
+    height: 3vh;
 }
 
 hr {
