@@ -40,13 +40,13 @@ footer {visibility: hidden;}
 .block-container {
     padding-left: 10% !important;
     padding-right: 10% !important;
-    padding-top: 3rem !important;
+    padding-top: 1rem !important;
 }
 
 /* Hero Section */
 .hero-section {
     text-align: center;
-    padding-top: 3vh;
+    padding-top: 1vh;
     padding-bottom: 4vh;
 }
 
