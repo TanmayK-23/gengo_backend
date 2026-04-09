@@ -45,19 +45,48 @@ def call_ollama(prompt):
 
 
 # =========================
+# Groq (High Performance Alternative)
+# =========================
+def call_groq(prompt):
+    api_key = os.getenv("GROQ_API_KEY")
+    url = "https://api.groq.com/openai/v1/chat/completions"
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [
+            {"role": "system", "content": "You are a professional SQL generator for legacy databases. Output raw SQL only."},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.1
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code != 200:
+        raise Exception(f"Groq Error: {response.text}")
+
+    return response.json()["choices"][0]["message"]["content"].strip()
+
+
+# =========================
 # Main LLM Caller
 # =========================
 def call_llm(prompt, use_fallback=False):
     try:
-        # If user explicitly wants fallback → Ollama
-        if use_fallback:
-            return call_ollama(prompt)
+        # 1. Use Groq if key is present (Fastest & most reliable)
+        if os.getenv("GROQ_API_KEY"):
+            return call_groq(prompt)
 
-        # Otherwise use Gemini
-        if os.getenv("GEMINI_API_KEY"):
+        # 2. Otherwise use Gemini
+        if os.getenv("GEMINI_API_KEY") and not use_fallback:
             return call_gemini(prompt)
 
-        # If Gemini key missing → fallback automatically
+        # 3. Last resort: Ollama (Only works locally)
         return call_ollama(prompt)
 
     except Exception as e:
