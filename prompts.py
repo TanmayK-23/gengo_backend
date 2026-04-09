@@ -25,7 +25,8 @@ Rules:
 - Use correct joins
 - Use table aliases
 - Output ONLY raw SQL starting with SELECT
-- Do not include any text before or after the SQL query
+- Use lowercase table and column names as provided in the schema
+- Use `ILIKE` instead of `=` for string filters to be case-insensitive
 - Use LIMIT when user asks for top results
 
 Schema:
