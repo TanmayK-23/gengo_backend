@@ -42,17 +42,16 @@ footer {visibility: hidden;}
 .hero-section {
     text-align: center;
     padding-top: 3vh;
-    padding-bottom: 6vh;
+    padding-bottom: 4vh;
 }
 
 .hero-section h1 {
-    font-size: 5rem !important;
+    font-size: 5.5rem !important;
     font-weight: 800 !important;
-    background: -webkit-linear-gradient(45deg, #0f172a, #3b82f6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #0f172a !important; /* Solid color to ensure it never disappears */
     margin-bottom: 5px !important;
     padding-bottom: 5px;
+    letter-spacing: -2px;
 }
 
 .hero-section .subtitle {
@@ -148,7 +147,7 @@ div.stDownloadButton > button p, div.stDownloadButton > button div, div.stDownlo
 }
 
 .massive-spacer {
-    height: 18vh;
+    height: 8vh;
 }
 
 hr {
