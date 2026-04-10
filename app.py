@@ -223,9 +223,11 @@ if submitted and user_input:
                 
                 if data.get("error"):
                     st.error(f"Error: {data['error']}")
+                    if data.get("provider"):
+                        st.caption(f"Provider: {data['provider']}")
                 else:
                     # Success
-                    st.markdown('<div class="success-box">Query generated and executed successfully!</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="success-box">Query generated and executed successfully! (via {data.get("provider", "LLM")})</div>', unsafe_allow_html=True)
                     
                     st.markdown("### Generated SQL")
                     st.code(data["sql"], language="sql")
@@ -268,7 +270,7 @@ if submitted and user_input:
                     if data.get("suggestion"):
                         st.info(data["suggestion"])
                     
-                    st.caption(f"End-to-end processing time: {req_time}ms (DB execution: {data.get('execution_time_ms', 0)}ms)")
+                    st.caption(f"⚡ Provider: {data.get('provider', 'N/A')} | End-to-end: {req_time}ms (DB: {data.get('execution_time_ms', 0)}ms)")
             
             else:
                 st.error(f"Backend Server Error ({response.status_code}): Ensure your Heroku Dyno is awake.")

@@ -78,16 +78,16 @@ def call_groq(prompt):
 # =========================
 def call_llm(prompt, use_fallback=False):
     try:
-        # 1. Use Groq if key is present (Fastest & most reliable)
+        # 1. Use Groq if key is present
         if os.getenv("GROQ_API_KEY"):
-            return call_groq(prompt)
+            return call_groq(prompt), "Groq (Llama 3)"
 
         # 2. Otherwise use Gemini
         if os.getenv("GEMINI_API_KEY") and not use_fallback:
-            return call_gemini(prompt)
+            return call_gemini(prompt), "Gemini 2.0 Flash"
 
         # 3. Last resort: Ollama (Only works locally)
-        return call_ollama(prompt)
+        return call_ollama(prompt), "Ollama (Local Llama 3)"
 
     except Exception as e:
-        return f"ERROR: {str(e)}"
+        return f"ERROR: {str(e)}", "Error"

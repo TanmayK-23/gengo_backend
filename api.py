@@ -40,32 +40,32 @@ def clean_sql_output(sql):
 @app.post("/query")
 def query(req: QueryRequest):
     prompt = build_prompt(req.question)
-    sql = call_llm(prompt, req.use_fallback)
+    sql, provider = call_llm(prompt, req.use_fallback)
 
     # Detect if the LLM returned an error instead of SQL
     if sql.strip().upper().startswith("ERROR"):
-        return {"error": f"LLM failed to generate SQL: {sql}"}
+        return {"error": f"LLM failed to generate SQL: {sql}", "provider": provider}
 
     sql = clean_sql_output(sql)
 
     if not is_safe_select(sql):
-        return {"error": "Unsafe query"}
+        return {"error": "Unsafe query", "provider": provider}
 
     try:
         rows, cols, time_taken, suggestion = execute_read_only_query(sql)
     except Exception as e:
         # self-correct once
         fix_prompt = build_correction_prompt(sql, str(e))
-        sql = call_llm(fix_prompt, req.use_fallback)
+        sql, provider = call_llm(fix_prompt, req.use_fallback)
         sql = clean_sql_output(sql)
 
         if not is_safe_select(sql):
-            return {"error": "Unsafe corrected query"}
+            return {"error": "Unsafe corrected query", "provider": provider}
 
         try:
             rows, cols, time_taken, suggestion = execute_read_only_query(sql)
         except Exception as e2:
-            return {"error": str(e2)}
+            return {"error": str(e2), "provider": provider}
 
     return {
         "sql": format_sql(sql),
@@ -73,5 +73,6 @@ def query(req: QueryRequest):
         "columns": cols,
         "execution_time_ms": round(time_taken * 1000, 2),
         "suggestion": suggestion,
+        "provider": provider,
         "error": None
     }
